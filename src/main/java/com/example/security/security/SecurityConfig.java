@@ -1,6 +1,5 @@
 package com.example.security.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -44,6 +43,7 @@ public class SecurityConfig {
         // change session to stateless which prevent session hijack attack
         // will generate differen id when refresh
         req.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        req.logout(logout -> logout.permitAll());
 
 
         return req.build();
