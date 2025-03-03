@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -16,23 +17,29 @@ public class Controller {
     @Autowired
     private StudentService service;
 
-    @GetMapping("/about")
+    @GetMapping("/public/about")
     public String about() {
         return "About";
     }
 
-    @GetMapping("/")
+    @GetMapping("/public")
     public String home(HttpServletRequest request) {
         return "Home " + request.getSession().getId();
     }
 
-    @GetMapping("/crsf")
+    @GetMapping("/admin/crsf")
     public CsrfToken csrf(HttpServletRequest request) {
         CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+        System.out.println(csrfToken);
         return csrfToken;
     }
 
-    @GetMapping("/students")
+    @GetMapping("/admin/about")
+    public String adminAbout() {
+        return "admin page";
+    }
+
+    @GetMapping("/user/students")
     public List<StudentModel> listStudent() {
         return service.listStudents();
     }

@@ -11,9 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.w3c.dom.Node;
 
 @Configuration
 @EnableWebSecurity
@@ -21,7 +19,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
 
-    @Autowired
+
     public SecurityConfig(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
@@ -32,8 +30,13 @@ public class SecurityConfig {
         req.csrf(customizer -> customizer.disable());
         // 2. same site strict will block cookie while routing through 3rd party
         // configured in the app.property
-        // this line will tell all the request should be authenticated
-        req.authorizeHttpRequests(reqest -> reqest.anyRequest().authenticated());
+
+        req.authorizeHttpRequests(reqest -> reqest
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/public/**").permitAll()
+                .anyRequest().authenticated() // this line will tell all the request should be authenticated
+        );
         // it will used to show login page without this we cant access site
 //        req.formLogin(Customizer.withDefaults()); // used for browser
         req.httpBasic(Customizer.withDefaults()); // used for postman
