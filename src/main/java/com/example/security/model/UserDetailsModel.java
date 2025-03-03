@@ -2,6 +2,8 @@ package com.example.security.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class UserDetailsModel {
@@ -11,9 +13,12 @@ public class UserDetailsModel {
     private int id;
 
     @Column(name = "user_name")
+    @NotBlank(message = "username is required")
     @JsonProperty("username")
     private String userName;
 
+    @NotBlank(message = "password is required")
+    @Size(min = 6, message = "password must be at least 6 characters")
     @Column(name = "password")
     private String password;
 
