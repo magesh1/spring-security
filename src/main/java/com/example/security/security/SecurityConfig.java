@@ -1,23 +1,30 @@
 package com.example.security.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.w3c.dom.Node;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final UserDetailsService userDetailsService;
+
+    @Autowired
+    public SecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity req) throws Exception {
@@ -39,37 +46,50 @@ public class SecurityConfig {
         return req.build();
     }
 
-    // this class will verify all the user creds
+    // used for db
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user1 = User
-                .withDefaultPasswordEncoder()
-                .username("ganesh")
-                .password("123")
-                .roles("USER")
-                .build();
+    public AuthenticationProvider authProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance()); // it will not check encoded password
+        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
+        provider.setUserDetailsService(userDetailsService);
 
-        UserDetails user2 = User
-                .withDefaultPasswordEncoder()
-                .username("bharath")
-                .password("234")
-                .roles("USER")
-                .build();
-
-        UserDetails user3 = User
-                .withDefaultPasswordEncoder()
-                .username("santhosh")
-                .password("santhosh")
-                .roles("CUS")
-                .build();
-        // mehtod -1
-//        return new InMemoryUserDetailsManager(user1, user2, user3);
-        // method -2
-        List<UserDetails> users = new ArrayList<>();
-        users.add(user1);
-        users.add(user2);
-        users.add(user3);
-        return new InMemoryUserDetailsManager(users);
+        return provider;
     }
+
+
+    // used for hard-coded
+//    // this class will verify all the user creds
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        UserDetails user1 = User
+//                .withDefaultPasswordEncoder()
+//                .username("ganesh")
+//                .password("123")
+//                .roles("USER")
+//                .build();
+//
+//        UserDetails user2 = User
+//                .withDefaultPasswordEncoder()
+//                .username("bharath")
+//                .password("234")
+//                .roles("USER")
+//                .build();
+//
+//        UserDetails user3 = User
+//                .withDefaultPasswordEncoder()
+//                .username("santhosh")
+//                .password("santhosh")
+//                .roles("CUS")
+//                .build();
+//        // mehtod -1
+////        return new InMemoryUserDetailsManager(user1, user2, user3);
+//        // method -2
+//        List<UserDetails> users = new ArrayList<>();
+//        users.add(user1);
+//        users.add(user2);
+//        users.add(user3);
+//        return new InMemoryUserDetailsManager(users);
+//    }
 
 }
